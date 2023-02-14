@@ -1,0 +1,59 @@
+#include <xc.h>
+
+__CONFIG(FOSC_HS & WDTE_OFF & PWRTE_ON & MCLRE_ON & CP_OFF & CPD_OFF & BOREN_OFF & IESO_OFF & FCMEN_OFF & LVP_OFF);
+#define _XTAL_FREQ 4000000
+
+void choptat() {
+    unsigned char i;
+    for (i = 0; i < 3; i++) {
+        PORTE = 0X00;
+        __delay_ms(500);
+        PORTE = 0X07;
+        __delay_ms(500);
+    }
+}
+
+void sang2s() {
+    PORTE = 0X07;
+    __delay_ms(2000);
+}
+
+void dem() {
+    unsigned char i;
+    for (i = 0; i < 8; i++) {
+        PORTE = i;
+        __delay_ms(500);
+    }
+}
+
+void __interrupt() ISR(void) {
+    PORTB;
+    RBIF = 0;
+    if (!RB0)
+        choptat();
+    else if (!RB1)
+        sang2s();
+    else if (!RB2)
+        dem();
+}
+
+void main(void) {
+    unsigned char i;
+    ANSEL = 0X00;
+    ANSELH = 0X00;
+    TRISE = 0X00;
+    TRISB = 0xFF;
+    nRBPU = 0;
+    WPUB = 0x07;
+    RBIF = 0; // xoa co ngat
+    RBIE = 1; //cho phep ngat portb
+    GIE = 1; //cho phep ngat toan cuc
+    IOCB0 = 1; //chọn ngắt tại RB0
+    IOCB1 = 1; //chọn ngắt tại RB1
+    IOCB2 = 1; //chọn ngắt tại RB2
+    
+    while (1) {
+        PORTE = 0X00;
+        PORTB;
+    }
+}

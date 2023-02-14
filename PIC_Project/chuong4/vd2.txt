@@ -1,0 +1,29 @@
+#include <xc.h>
+#include <stdint.h>
+
+__CONFIG(FOSC_HS & WDTE_OFF & PWRTE_ON & MCLRE_ON & CP_OFF & CPD_OFF & BOREN_OFF & IESO_OFF & FCMEN_OFF & LVP_OFF);
+#define _XTAL_FREQ 4000000
+
+void __interrupt() ISR(void) {
+//    static uint8_t cnt = 0;
+    
+}
+
+void timer0_counter_init()
+{
+    ANSEL = 0x00;
+    ANSELH = 0x00;
+    TRISD = 0x00;
+    OPTION_REG = 0x20;
+    TMR0 = 0;
+}
+
+void main(void) 
+{
+    timer0_counter_init();
+    uint8_t cnt = 0;
+    while (1) {
+        cnt  = TMR0;
+        PORTD = ( cnt /10) | (cnt % 10);
+    }
+}

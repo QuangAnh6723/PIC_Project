@@ -1,0 +1,35 @@
+#include <xc.h>
+
+__CONFIG(FOSC_HS & WDTE_OFF & PWRTE_ON & MCLRE_ON & CP_OFF & CPD_OFF & BOREN_OFF & IESO_OFF & FCMEN_OFF & LVP_OFF);
+#define _XTAL_FREQ 4000000
+
+void adc_init()
+{
+    ANSEL = 0x00;
+    ANSELH = 0x01;
+    TRISA0 = 1;
+    TRISC = 0x00;
+    TRISD = 0x00;
+    
+    VCFG0 = 0;
+    VCFG1 = 0;
+    ADFM = 1;
+    ADIF = 0;
+    GIE = 0; PEIE = 0; ADIE = 0;
+    ADCON0 = 0b01000001;   
+}    
+
+void main(void) {
+    adc_init();
+    
+    while(1)
+    {
+        __delay_ms(6);
+        GO = 1;
+        while(GO);
+        PORTD = ADRESH;
+        PORTC = ADRESL;
+    }
+    
+    return;
+}

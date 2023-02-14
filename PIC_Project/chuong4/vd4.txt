@@ -1,0 +1,54 @@
+#include <xc.h>
+
+__CONFIG(FOSC_HS & WDTE_OFF & PWRTE_ON & MCLRE_ON & CP_OFF & CPD_OFF & BOREN_OFF & IESO_OFF & FCMEN_OFF & LVP_OFF);
+#define _XTAL_FREQ 4000000
+
+void so_12() {
+    PORTD = 0X12;
+    __delay_ms(2000);
+}
+
+void so_24() {
+    PORTD = 0X24;
+    __delay_ms(2000);
+}
+
+void dem() {
+    unsigned char i, a;
+    for (i = 0; i < 24; i++) {
+        a = i / 10;
+        PORTD = (a << 4) | (i % 10);
+        __delay_ms(500);
+    }
+}
+
+void __interrupt() ISR(void) {
+    PORTB;
+    RBIF = 0;
+    if (!RB0)
+        so_12();
+    else if (!RB1)
+        so_24();
+    else if (!RB2)
+        dem();
+}
+
+void main(void) {
+    unsigned char i;
+    ANSEL = 0X00;
+    ANSELH = 0X00;
+    TRISD = 0X00;
+    TRISB = 0xFF;
+    nRBPU = 0;
+    WPUB = 0x07;
+    RBIF = 0; // xoa co ngat
+    RBIE = 1; //cho phep ngat portb
+    GIE = 1; //cho phep ngat toan cuc
+    IOCB0 = 1; //chọn ngắt tại RB0
+    IOCB1 = 1; //chọn ngắt tại RB1
+    IOCB2 = 1; //chọn ngắt tại RB2
+    while (1) {
+        PORTD = 0X00;
+        PORTB;
+    }
+}

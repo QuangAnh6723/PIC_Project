@@ -1,0 +1,33 @@
+#include <xc.h>
+
+__CONFIG(FOSC_HS & WDTE_OFF & PWRTE_ON & MCLRE_ON & CP_OFF & CPD_OFF & BOREN_OFF & IESO_OFF & FCMEN_OFF & LVP_OFF);
+#define _XTAL_FREQ 4000000
+
+void PWM_init()
+{
+    ANSEL = 0x00;
+    ANSELH = 0x00;
+    TRISC2 = 1;     // cam xuat xung
+    TMR2 = 0x00;
+    
+    PR2 = 124;
+    CCPR1L = 62;
+    DC1B1 = 1;
+    DC1B0 = 0;
+    
+    CCP1CON = 0x0C;
+    TMR2IF = 0;
+    T2CKPS1 = 0;
+    T2CKPS0 = 0; // chon pre = 4
+    TMR2ON = 1;
+    
+    while(TMR2IF == 0);
+    TRISC2 = 0; // xuat xung
+    
+}
+
+void main(void) {
+    PWM_init();
+    while(1);
+    return;
+}
